@@ -44,32 +44,57 @@ app.post('/meter', async (req, res) => {
   }
 });
 
-app.get('/api/past/:noDays',(req,res)=>{
 
- 
+app.get('/api/:category/past/:noDays',(req,res)=>{
+
+    const category = req.params.category;
     const n = parseInt(req.params.noDays);
-  
-    const rows = [];
-    fs.createReadStream('data/boys.csv')
-      .pipe(csv())
-      .on('data', (row) => {
-        rows.push(row);
-      })
-      .on('end', () => {
-        const lastNRows = rows.slice(-n);
-        res.send(lastNRows);
-      });
+
+    if(category!="boys" && category!="girls")
+    {
+        res.send("Boys/Girls Only")
+        return
+    }
+
+
+    try {
+
+      const rows = [];
+      fs.createReadStream(`data/${category}.csv`)
+        .pipe(csv())
+        .on('data', (row) => {
+          rows.push(row);
+        })
+        .on('end', () => {
+          const lastNRows = rows.slice(-n);
+          res.send(lastNRows);
+        });
+      
+    } catch (err) {
+      
+      res.send("Some Error Occured");
+    }
+
+
 
 });
 
 
-app.get('/api/future',(req,res)=>{
+app.get('/api/:category/future',(req,res)=>{
 
  
   // const n = parseInt(req.params.noDays);
 
+  const category = req.params.category;
+
+  if(category!="boys" && category!="girls")
+  {
+      res.send("Boys/Girls Only")
+      return
+  }
+
   const rows = [];
-  fs.createReadStream('data/boys_future.csv')
+  fs.createReadStream(`data/${category}_future.csv`)
     .pipe(csv())
     .on('data', (row) => {
       rows.push(row);
