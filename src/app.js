@@ -63,6 +63,25 @@ app.get('/api/past/:noDays',(req,res)=>{
 });
 
 
+app.get('/api/future',(req,res)=>{
+
+ 
+  // const n = parseInt(req.params.noDays);
+
+  const rows = [];
+  fs.createReadStream('data/boys_future.csv')
+    .pipe(csv())
+    .on('data', (row) => {
+      rows.push(row);
+    })
+    .on('end', () => {
+      // const lastNRows = rows.slice(-n);
+      res.send(rows);
+    });
+
+});
+
+
 app.listen(3000, () => {
   console.log('App listening on port 3000');
 });
