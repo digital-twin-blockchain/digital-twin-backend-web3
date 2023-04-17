@@ -2,6 +2,8 @@ const express = require('express');
 const Web3 = require('web3');
 const fs = require('fs');
 const path = require('path');
+const csv = require('csv-parser');
+
 
 require('dotenv').config()
 
@@ -41,6 +43,25 @@ app.post('/meter', async (req, res) => {
 
   }
 });
+
+app.get('/api/past/:noDays',(req,res)=>{
+
+ 
+    const n = parseInt(req.params.noDays);
+  
+    const rows = [];
+    fs.createReadStream('data/boys.csv')
+      .pipe(csv())
+      .on('data', (row) => {
+        rows.push(row);
+      })
+      .on('end', () => {
+        const lastNRows = rows.slice(-n);
+        res.send(lastNRows);
+      });
+
+});
+
 
 app.listen(3000, () => {
   console.log('App listening on port 3000');
