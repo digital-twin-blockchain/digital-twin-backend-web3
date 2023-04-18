@@ -25,6 +25,13 @@ const app = express();
       
 app.use(express.json())
 
+
+/**
+ * 
+ * WEB3 Endpoints
+ */
+
+
 // Define a POST endpoint for adding meter records
 app.post('/meter', async (req, res) => {
   try {
@@ -43,6 +50,83 @@ app.post('/meter', async (req, res) => {
 
   }
 });
+
+
+
+// Define an endpoint to get all records from blockchain
+app.get('/api/web3/getall', async (req, res) => {
+  try {
+
+    const records = await contract.methods.getAllRecords().call();
+
+    res.json(records);
+
+  } catch (error) {
+
+    console.error(error);
+    res.status(500).send('Error fetching records');
+
+  }
+});
+
+
+// Define an endpoint to get record at index from blockchain
+app.get('/api/web3/get/:index', async (req, res) => {
+  try {
+    const no = req.params.index;
+
+    const ln = await contract.methods.getRecordCount().call();
+
+    if(no>=ln) 
+    {
+       res.send(`Total Index = ${ln} Index Requested = ${no}`);
+       return;
+    }
+
+    const record = await contract.methods.getRecord(nos).call();
+
+    res.json(record);
+
+  } catch (error) {
+
+    console.error(error);
+    res.status(500).send('Error fetching records');
+
+  }
+});
+
+
+// Define an endpoint to get last n records from blockchain
+app.get('/api/web3/getlast/:no', async (req, res) => {
+  try {
+
+    const no = req.params.no;
+
+    const ln = await contract.methods.getRecordCount().call();
+    
+    let records = [];
+
+    for(let i=ln-1;i>=Math.max(0,ln-no);i--)
+    {
+      const record = await contract.methods.getRecord(i).call();
+      records.push(record);
+    }
+
+    res.json(records);
+
+  } catch (error) {
+
+    console.error(error);
+    res.status(500).send('Error fetching records');
+
+  }
+});
+
+
+
+/**
+ *  Web2 Endpoints
+ */
 
 
 //Get Past Days (noDays) Data (Here Category=> boys, girls)

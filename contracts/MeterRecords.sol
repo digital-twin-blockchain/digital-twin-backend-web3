@@ -25,4 +25,21 @@ contract MeterRecords {
     function getRecordCount() public view returns (uint256) {
         return records.length;
     }
+
+
+    function getAllRecords() public view returns (MeterRecord[] memory) {
+        return records;
+    }
+
+    function getLastNRecords(uint256 n) public view returns (MeterRecord[] memory) {
+        require(n <= records.length, "n exceeds the number of records");
+        
+        MeterRecord[] memory lastNRecords = new MeterRecord[](n);
+        
+        for (uint256 i = 0; i < n; i++) {
+            lastNRecords[i] = records[records.length - n + i];
+        }
+        
+        return lastNRecords;
+    }
 }
