@@ -45,6 +45,7 @@ app.post('/meter', async (req, res) => {
 });
 
 
+//Get Past Days (noDays) Data (Here Category=> boys, girls)
 app.get('/api/:category/past/:noDays',(req,res)=>{
 
     const category = req.params.category;
@@ -79,7 +80,7 @@ app.get('/api/:category/past/:noDays',(req,res)=>{
 
 });
 
-
+//Get Future Data (Here Category=> boys, girls)
 app.get('/api/:category/future',(req,res)=>{
 
  
