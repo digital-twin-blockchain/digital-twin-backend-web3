@@ -22,7 +22,7 @@ const contractAddress = process.env.CONTRACT_ADDRESS;
 const contract = new web3.eth.Contract(contractABI.abi, contractAddress);
 
 const app = express();
-
+      
 app.use(express.json())
 
 // Define a POST endpoint for adding meter records
@@ -105,6 +105,36 @@ app.get('/api/:category/future',(req,res)=>{
     });
 
 });
+
+
+
+//Get todays Data (Here Category=> b1,b2,g)
+app.get('/api/:category/current',(req,res)=>{
+    const category = req.params.category;
+
+    if(category!="b1" && category!="b2" && category!="g")
+    {
+        res.send("Boys/Girls Only")
+        return
+    }
+
+
+    const rows = [];
+    fs.createReadStream(`data/present/raw_today_${category}_block.csv`)
+      .pipe(csv())
+      .on('data', (row) => {
+        rows.push(row);
+      })
+      .on('end', () => {
+        // const lastNRows = rows.slice(-n);
+        res.send(rows);
+      });
+});
+
+
+app.all('*',(req,res)=>{
+  res.send("Not found 404")
+})
 
 
 app.listen(3000, () => {
