@@ -33,15 +33,41 @@ app.use(express.json())
 
 
 // Define a POST endpoint for adding meter records
-app.post('/meter', async (req, res) => {
+app.post('/meter/:category', async (req, res) => {
   try {
+
+    const category = req.params.category;
+
+    if(category!="b1" && category!="b2" && category!="g")
+    {
+        res.send("Boys/Girls Only");
+        return;
+    }
 
     const { time, vplus, qv, vminus, cputemp } = req.body;
 
-    const receipt = await contract.methods.addRecord(time, vplus, qv, vminus, cputemp)
+
+    if(category=="b1")
+    {
+      const receipt = await contract.methods.addRecordB1(time, vplus, qv, vminus, cputemp)
       .send({ from: account,gas:1000000});
 
-    res.json(receipt);
+      res.json(receipt);
+    }
+    else if(category=="b2")
+    {
+      const receipt = await contract.methods.addRecordB2(time, vplus, qv, vminus, cputemp)
+      .send({ from: account,gas:1000000});
+
+      res.json(receipt);
+    }
+    else if(category=="g")
+    {
+      const receipt = await contract.methods.addRecordG(time, vplus, qv, vminus, cputemp)
+      .send({ from: account,gas:1000000});
+
+      res.json(receipt);
+    }
 
   } catch (error) {
 
@@ -57,7 +83,7 @@ app.post('/meter', async (req, res) => {
 app.get('/api/web3/getall', async (req, res) => {
   try {
 
-    const records = await contract.methods.getAllRecords().call();
+    const records = await contract.methods.getAllRecordsB1().call();
 
     res.json(records);
 
@@ -75,7 +101,7 @@ app.get('/api/web3/get/:index', async (req, res) => {
   try {
     const no = req.params.index;
 
-    const ln = await contract.methods.getRecordCount().call();
+    const ln = await contract.methods.getRecordCountB1().call();
 
     if(no>=ln) 
     {
@@ -83,7 +109,7 @@ app.get('/api/web3/get/:index', async (req, res) => {
        return;
     }
 
-    const record = await contract.methods.getRecord(nos).call();
+    const record = await contract.methods.getRecordB1(nos).call();
 
     res.json(record);
 
@@ -102,13 +128,13 @@ app.get('/api/web3/getlast/:no', async (req, res) => {
 
     const no = req.params.no;
 
-    const ln = await contract.methods.getRecordCount().call();
+    const ln = await contract.methods.getRecordCountB1().call();
     
     let records = [];
 
     for(let i=ln-1;i>=Math.max(0,ln-no);i--)
     {
-      const record = await contract.methods.getRecord(i).call();
+      const record = await contract.methods.getRecordB1(i).call();
       records.push(record);
     }
 
